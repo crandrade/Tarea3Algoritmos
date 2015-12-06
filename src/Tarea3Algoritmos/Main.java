@@ -1,4 +1,4 @@
-package Tarea1Algoritmos;
+package Tarea3Algoritmos;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,12 +21,7 @@ import org.apache.commons.cli.ParseException;
 
 
 public class Main {
-	static protected char[] binarytext;
-	static protected char[] realDNA;
-	static protected char[] fakeDNA;
-	static protected char[] plaintext;
-	static protected char[] faketext;
-	
+	static protected char[] keys;
 	
 	@SuppressWarnings("resource")
 	static public char [] init(String filename) throws FileNotFoundException{
@@ -37,7 +32,7 @@ public class Main {
 		while (scanner.hasNextLine()) {
 		       line += scanner.nextLine();
 		}
-		//line = line.trim().replaceAll("[^A-Za-z ]", " ");
+		//line = line.trim().replaceAll("[^0-9 ]", "");
 		return line.toCharArray();
 	}
 	static public void destroy(char[] text){
@@ -150,7 +145,7 @@ public class Main {
 		if (cmd.hasOption("b")) {
 			binarytext = init("binary.txt");
 			printer.println("Binary Text");
-			GenericTextSearch brute = new BruteForceSearch(binarytext);
+			GenericTree abb = new BruteForceSearch(binarytext);
 			GenericTextSearch kmp = new KnuthMorrisPrattSearch(binarytext);
 			GenericTextSearch bmh = new BoyerMooreHorspoolSearch(binarytext);
 			printer.println("Binary:");
