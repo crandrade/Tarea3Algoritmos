@@ -1,12 +1,16 @@
 package Tarea3Algoritmos;
 
+
 public interface GenericTree {
-	public interface Node{
-		
-	}
-	public int get(Comparable<?> key);
+
+	public long size();
 	
-	public Object insert(Comparable<?> key);
+	@SuppressWarnings("rawtypes")
+	public Comparable get(Comparable key);
 	
-	public void delete(Comparable<?> key);
+	@SuppressWarnings("rawtypes")
+	public void insert(Comparable key);
+	
+	@SuppressWarnings("rawtypes")
+	public boolean delete(Comparable key);
 }

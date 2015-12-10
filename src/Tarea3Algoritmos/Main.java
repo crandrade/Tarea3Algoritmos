@@ -40,16 +40,20 @@ public class Main {
 		System.gc();
 	}
 	
-	static public char[] generatePatron(boolean o, char[] text, int l){
-		char [] patron = new char[l];
-		if(o){
-			for(int i=0; i<l; i++){
-				patron[i] = (char) ThreadLocalRandom.current().nextInt(0,2);
+	static public int [] generateIntArray(boolean o, int [] chain, int l){
+		int [] patron = new int [10000];
+		int max = Integer.MAX_VALUE;
+		if(o){ // o == true
+			int k = (int)Math.pow(2,l);
+			for(int j = 0; j< 10000; j++){
+				int i = ThreadLocalRandom.current().nextInt(0, k);
+				patron[j] = chain[i];
 			}
 		}
-		else{
-			int i = ThreadLocalRandom.current().nextInt(0, text.length-l+1);
-			patron = Arrays.copyOfRange(text, i, i+l);
+		else{ //o == false
+			for(int j = 0; j< 10000; j++){
+				patron[j] = ThreadLocalRandom.current().nextInt(0, max);
+			}
 		}
 		return patron;
 	}
@@ -72,26 +76,12 @@ public class Main {
 		Option power2 = new Option("I", "Log (Max lenght of patron)");
 		power2.setArgs(1);
 		power2.setRequired(true);
-		Option binary = new Option("b", "Binary input file");
-		binary.setArgs(0);
-		Option rDNA = new Option("rd", "Real DNA input file");
-		rDNA.setArgs(0);
-		Option fDNA = new Option("fd", "Fake DNA input file");
-		fDNA.setArgs(0);
-		Option rText = new Option("pt", "Real text input file");
-		rText.setArgs(0);
-		Option fText = new Option("ft", "Fake text input file");
-		fText.setArgs(0);
 
 		Options options = new Options();
 		options.addOption(iter);
 		options.addOption(power);
 		options.addOption(power2);
-		options.addOption(binary);
-		options.addOption(rDNA);
-		options.addOption(fDNA);
-		options.addOption(rText);
-		options.addOption(fText);
+
 		
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = null;
