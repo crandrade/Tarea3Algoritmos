@@ -12,5 +12,5 @@ public interface GenericTree {
 	public void insert(Comparable key);
 	
 	@SuppressWarnings("rawtypes")
-	public boolean delete(Comparable key);
+	public void delete(Comparable key);
 }

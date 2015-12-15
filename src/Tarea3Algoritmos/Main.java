@@ -123,31 +123,37 @@ public class Main {
 		boolean random = true;
 		boolean extracted = false;
 		long t=0;
-		SummaryStatistics BFsum;
-		SummaryStatistics BFtime;
-		SummaryStatistics KMPsum;
-		SummaryStatistics KMPtime;
-		SummaryStatistics BMHsum;
-		SummaryStatistics BMHtime;
+		SummaryStatistics ABBsize;
+		SummaryStatistics ABBtime;
+		SummaryStatistics AVLsize;
+		SummaryStatistics AVLtime;
+		SummaryStatistics SPLsize;
+		SummaryStatistics SPLtime;
+		SummaryStatistics VEBsize;
+		SummaryStatistics VEBtime;
 		
 		
 		// test binary
 		if (cmd.hasOption("b")) {
 			binarytext = init("binary.txt");
 			printer.println("Binary Text");
-			GenericTree abb = new BruteForceSearch(binarytext);
-			GenericTextSearch kmp = new KnuthMorrisPrattSearch(binarytext);
-			GenericTextSearch bmh = new BoyerMooreHorspoolSearch(binarytext);
+			GenericTree abb = new ABB();
+			GenericTree avl = new AVL();
+			GenericTree spl = new SplayTree();
+			//GenericTree veb = new VanEmdeBoas();
+			GenericTree veb = new DummyVanEmdeBoas();
 			printer.println("Binary:");
 			for(int i=l; i<=L; i++){
 				System.err.println("2^"+i);
 				printer.println("2^"+i);
-				BFsum = new SummaryStatistics();
-				BFtime = new SummaryStatistics();
-				KMPsum = new SummaryStatistics();
-				KMPtime = new SummaryStatistics();
-				BMHsum = new SummaryStatistics();
-				BMHtime = new SummaryStatistics();
+				ABBsize = new SummaryStatistics();
+				ABBtime = new SummaryStatistics();
+				AVLsize = new SummaryStatistics();
+				AVLtime = new SummaryStatistics();
+				SPLsize = new SummaryStatistics();
+				SPLtime = new SummaryStatistics();
+				VEBsize = new SummaryStatistics();
+				VEBtime = new SummaryStatistics();
 				for(int iterations=1; true; iterations++){
 					char [] patron = generatePatron(random, 
 							binarytext, (int)Math.pow(2, i));
@@ -228,402 +234,8 @@ public class Main {
 				}
 				
 			}
-			destroy(binarytext);
+			destroy();
 			printer.println();
-		}
-		// test real DNA
-		if (cmd.hasOption("rd")) {
-			realDNA = init("realDNA.txt");
-			printer.println("Real DNA Text");
-			GenericTextSearch brute = new BruteForceSearch(realDNA);
-			GenericTextSearch kmp = new KnuthMorrisPrattSearch(realDNA);
-			GenericTextSearch bmh = new BoyerMooreHorspoolSearch(realDNA);
-			for(int i=l; i<=L; i++){
-				System.err.println("2^"+i);
-				printer.println("2^"+i);
-				BFsum = new SummaryStatistics();
-				BFtime = new SummaryStatistics();
-				KMPsum = new SummaryStatistics();
-				KMPtime = new SummaryStatistics();
-				BMHsum = new SummaryStatistics();
-				BMHtime = new SummaryStatistics();
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							realDNA, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BFsum.addValue((double)(brute.search(patron)));
-					BFtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados realDNA BF");
-						System.err.println("Promedio tiempo: "+(BFtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BFtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BFtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BFsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BFsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BFsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BFsum, iterations) 
-							&& acceptableError(BFtime, iterations) || iterations >= max_it){
-						printer.println("BF Iterations: "+iterations);
-						printer.println("BFtime:\t"+BFtime.getMean()+"\t"+BFtime.getVariance()+"\t"+BFtime.getStandardDeviation());
-						printer.println("BFsum:\t"+BFsum.getMean()+"\t"+BFsum.getVariance()+"\t"+BFsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							realDNA, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					KMPsum.addValue((double)(kmp.search(patron)));
-					KMPtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados realDNA KMP");
-						System.err.println("Promedio tiempo: "+(KMPtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(KMPtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*KMPtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(KMPsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(KMPsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*KMPsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BFsum, iterations) 
-							&& acceptableError(BFtime, iterations) || iterations >= max_it){
-						printer.println("KMP Iterations: "+iterations);
-						printer.println("KMPtime:\t"+KMPtime.getMean()+"\t"+KMPtime.getVariance()+"\t"+KMPtime.getStandardDeviation());
-						printer.println("KMPsum:\t"+KMPsum.getMean()+"\t"+KMPsum.getVariance()+"\t"+KMPsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							realDNA, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BMHsum.addValue((double)(bmh.search(patron)));
-					BMHtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados realDNA BMH");
-						System.err.println("Promedio tiempo: "+(BMHtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BMHtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BMHtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BMHsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BMHsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BMHsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BFsum, iterations) 
-							&& acceptableError(BFtime, iterations) || iterations >= max_it){
-						printer.println("BMH Iterations: "+iterations);
-						printer.println("BMHtime:\t"+BMHtime.getMean()+"\t"+BMHtime.getVariance()+"\t"+BMHtime.getStandardDeviation());
-						printer.println("BMHsum:\t"+BMHsum.getMean()+"\t"+BMHsum.getVariance()+"\t"+BMHsum.getStandardDeviation());
-						break;
-					}
-				}
-				
-			}
-			destroy(realDNA);
-		}
-		
-		// test fake DNA
-		if (cmd.hasOption("fd")) {
-			fakeDNA = init("fakeDNA.txt");
-			printer.println("Fake DNA Text");
-			GenericTextSearch brute = new BruteForceSearch(fakeDNA);
-			GenericTextSearch kmp = new KnuthMorrisPrattSearch(fakeDNA);
-			GenericTextSearch bmh = new BoyerMooreHorspoolSearch(fakeDNA);
-			for(int i=l; i<=L; i++){
-				System.err.println("2^"+i);
-				printer.println("2^"+i);
-				BFsum = new SummaryStatistics();
-				BFtime = new SummaryStatistics();
-				KMPsum = new SummaryStatistics();
-				KMPtime = new SummaryStatistics();
-				BMHsum = new SummaryStatistics();
-				BMHtime = new SummaryStatistics();
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							fakeDNA, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BFsum.addValue((double)(brute.search(patron)));
-					BFtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados fakeDNA BF");
-						System.err.println("Promedio tiempo: "+(BFtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BFtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BFtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BFsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BFsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BFsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BFsum, iterations) 
-							&& acceptableError(BFtime, iterations) || iterations >= max_it){
-						printer.println("BF Iterations: "+iterations);
-						printer.println("BFtime:\t"+BFtime.getMean()+"\t"+BFtime.getVariance()+"\t"+BFtime.getStandardDeviation());
-						printer.println("BFsum:\t"+BFsum.getMean()+"\t"+BFsum.getVariance()+"\t"+BFsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							fakeDNA, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					KMPsum.addValue((double)(kmp.search(patron)));
-					KMPtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados fakeDNA KMP");
-						System.err.println("Promedio tiempo: "+(KMPtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(KMPtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*KMPtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(KMPsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(KMPsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*KMPsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(KMPsum, iterations) 
-							&& acceptableError(KMPtime, iterations) || iterations >= max_it){
-						printer.println("KMP Iterations: "+iterations);
-						printer.println("KMPtime:\t"+KMPtime.getMean()+"\t"+KMPtime.getVariance()+"\t"+KMPtime.getStandardDeviation());
-						printer.println("KMPsum:\t"+KMPsum.getMean()+"\t"+KMPsum.getVariance()+"\t"+KMPsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							fakeDNA, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BMHsum.addValue((double)(bmh.search(patron)));
-					BMHtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados fakeDNA BMH");
-						System.err.println("Promedio tiempo: "+(BMHtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BMHtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BMHtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BMHsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BMHsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BMHsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BMHsum, iterations) 
-							&& acceptableError(BMHtime, iterations) || iterations >= max_it){
-						printer.println("BMH Iterations: "+iterations);
-						printer.println("BMHtime:\t"+BMHtime.getMean()+"\t"+BMHtime.getVariance()+"\t"+BMHtime.getStandardDeviation());
-						printer.println("BMHsum:\t"+BMHsum.getMean()+"\t"+BMHsum.getVariance()+"\t"+BMHsum.getStandardDeviation());
-						break;
-					}
-				}
-				
-			}
-			destroy(fakeDNA);
-		}
-		// test plain text
-		if (cmd.hasOption("pt")) {
-			plaintext = init("plainText.txt");
-			printer.println("Plain Text");			
-			GenericTextSearch brute = new BruteForceSearch(plaintext);
-			GenericTextSearch kmp = new KnuthMorrisPrattSearch(plaintext);
-			GenericTextSearch bmh = new BoyerMooreHorspoolSearch(plaintext);
-			for(int i=l; i<=L; i++){
-				System.err.println("2^"+i);
-				printer.println("2^"+i);
-				BFsum = new SummaryStatistics();
-				BFtime = new SummaryStatistics();
-				KMPsum = new SummaryStatistics();
-				KMPtime = new SummaryStatistics();
-				BMHsum = new SummaryStatistics();
-				BMHtime = new SummaryStatistics();
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							plaintext, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BFsum.addValue((double)(brute.search(patron)));
-					BFtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados plaintext BF");
-						System.err.println("Promedio tiempo: "+(BFtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BFtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BFtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BFsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BFsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BFsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BFsum, iterations) 
-							&& acceptableError(BFtime, iterations) || iterations >= max_it){
-						printer.println("BF Iterations: "+iterations);
-						printer.println("BFtime:\t"+BFtime.getMean()+"\t"+BFtime.getVariance()+"\t"+BFtime.getStandardDeviation());
-						printer.println("BFsum:\t"+BFsum.getMean()+"\t"+BFsum.getVariance()+"\t"+BFsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							plaintext, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					KMPsum.addValue((double)(kmp.search(patron)));
-					KMPtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados plaintext KMP");
-						System.err.println("Promedio tiempo: "+(KMPtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(KMPtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*KMPtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(KMPsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(KMPsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*KMPsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(KMPsum, iterations) 
-							&& acceptableError(KMPtime, iterations) || iterations >= max_it){
-						printer.println("KMP Iterations: "+iterations);
-						printer.println("KMPtime:\t"+KMPtime.getMean()+"\t"+KMPtime.getVariance()+"\t"+KMPtime.getStandardDeviation());
-						printer.println("KMPsum:\t"+KMPsum.getMean()+"\t"+KMPsum.getVariance()+"\t"+KMPsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							plaintext, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BMHsum.addValue((double)(bmh.search(patron)));
-					BMHtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados realText BMH");
-						System.err.println("Promedio tiempo: "+(BMHtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BMHtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BMHtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BMHsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BMHsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BMHsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BMHsum, iterations) 
-							&& acceptableError(BMHtime, iterations) || iterations >= max_it){
-						printer.println("BMH Iterations: "+iterations);
-						printer.println("BMHtime:\t"+BMHtime.getMean()+"\t"+BMHtime.getVariance()+"\t"+BMHtime.getStandardDeviation());
-						printer.println("BMHsum:\t"+BMHsum.getMean()+"\t"+BMHsum.getVariance()+"\t"+BMHsum.getStandardDeviation());
-						break;
-					}
-				}
-				
-			}
-			destroy(plaintext);
-		}
-		
-		// test fake Text
-		if (cmd.hasOption("ft")) {
-			faketext = init("fakeText.txt");
-			printer.println("Fake Text");
-			GenericTextSearch brute = new BruteForceSearch(faketext);
-			GenericTextSearch kmp = new KnuthMorrisPrattSearch(faketext);
-			GenericTextSearch bmh = new BoyerMooreHorspoolSearch(faketext);
-			for(int i=l; i<=L; i++){
-				System.err.println("2^"+i);
-				printer.println("2^"+i);
-				BFsum = new SummaryStatistics();
-				BFtime = new SummaryStatistics();
-				KMPsum = new SummaryStatistics();
-				KMPtime = new SummaryStatistics();
-				BMHsum = new SummaryStatistics();
-				BMHtime = new SummaryStatistics();
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							faketext, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BFsum.addValue((double)(brute.search(patron)));
-					BFtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados faketext BF");
-						System.err.println("Promedio tiempo: "+(BFtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BFtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BFtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BFsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BFsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BFsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BFsum, iterations) 
-							&& acceptableError(BFtime, iterations) || iterations >= max_it){
-						printer.println("BF Iterations: "+iterations);
-						printer.println("BFtime:\t"+BFtime.getMean()+"\t"+BFtime.getVariance()+"\t"+BFtime.getStandardDeviation());
-						printer.println("BFsum:\t"+BFsum.getMean()+"\t"+BFsum.getVariance()+"\t"+BFsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							faketext, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					KMPsum.addValue((double)(kmp.search(patron)));
-					KMPtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados faketext KMP");
-						System.err.println("Promedio tiempo: "+(KMPtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(KMPtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*KMPtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(KMPsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(KMPsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*KMPsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(KMPsum, iterations) 
-							&& acceptableError(KMPtime, iterations) || iterations >= max_it){
-						printer.println("KMP Iterations: "+iterations);
-						printer.println("KMPtime:\t"+KMPtime.getMean()+"\t"+KMPtime.getVariance()+"\t"+KMPtime.getStandardDeviation());
-						printer.println("KMPsum:\t"+KMPsum.getMean()+"\t"+KMPsum.getVariance()+"\t"+KMPsum.getStandardDeviation());
-						break;
-					}
-				}
-				for(int iterations=1; true; iterations++){
-					char [] patron = generatePatron(extracted, 
-							faketext, (int)Math.pow(2, i));
-					t = System.currentTimeMillis();
-					BMHsum.addValue((double)(bmh.search(patron)));
-					BMHtime.addValue((double)(System.currentTimeMillis() - t));
-					if(iterations%10000 == 0){
-						System.out.println(""+iterations);
-						System.err.println("Resultados faketext BMH");
-						System.err.println("Promedio tiempo: "+(BMHtime.getMean()/1000)+" seg.");
-						System.err.println("DEstandar tiempo: "+(BMHtime.getStandardDeviation()/1000)+" seg.");
-						System.err.println("Error tiempo: "+((2*BMHtime.getStandardDeviation())/
-								Math.sqrt(iterations)*1000)+" seg.");
-						System.err.println("Promedio comps: "+(BMHsum.getMean())+" comps.");
-						System.err.println("DEstandar comps: "+(BMHsum.getStandardDeviation())+" comps.");
-						System.err.println("Error comps: "+((2*BMHsum.getStandardDeviation())/
-								Math.sqrt(iterations))+" comps.");
-					}
-					if(acceptableError(BMHsum, iterations) 
-							&& acceptableError(BMHtime, iterations) || iterations >= max_it){
-						printer.println("BMH Iterations: "+iterations);
-						printer.println("BMHtime:\t"+BMHtime.getMean()+"\t"+BMHtime.getVariance()+"\t"+BMHtime.getStandardDeviation());
-						printer.println("BMHsum:\t"+BMHsum.getMean()+"\t"+BMHsum.getVariance()+"\t"+BMHsum.getStandardDeviation());
-						break;
-					}
-				}
-			}
-			destroy(faketext);
-			printer.close();
 		}
 	}
 }

@@ -59,9 +59,9 @@ public class AVL implements GenericTree {
 	}
 
 	@Override
-	public boolean delete(Comparable key) {
+	public void delete(Comparable key) {
 		// TODO Auto-generated method stub
-		return false;
+		return;
 	}
 
 }

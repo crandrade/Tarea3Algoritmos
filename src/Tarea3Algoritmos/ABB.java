@@ -1,19 +1,22 @@
 package Tarea3Algoritmos;
 
+import java.io.*;
+import org.junit.*;
+import com.javamex.classmexer.*;
+
 public class ABB implements GenericTree {
 	private Node root;
 	
 	private class Node{
 		@SuppressWarnings("rawtypes")
 		private Comparable key;
-		private Node left, right, father;
+		private Node left, right;
 		
 		@SuppressWarnings("rawtypes")
-		public Node(Comparable i, Node left, Node right, Node father){
+		public Node(Comparable i, Node left, Node right){
 			this.key = i;
 			this.setLeft(left);
 			this.setRight(right);
-			this.setFather(father);
 		}
 		public Node getRight() {
 			return right;
@@ -26,12 +29,6 @@ public class ABB implements GenericTree {
 		}
 		public void setLeft(Node left) {
 			this.left = left;
-		}
-		public Node getFather() {
-			return father;
-		}
-		public void setFather(Node father) {
-			this.father = father;
 		}
 	}
 	
@@ -63,7 +60,7 @@ public class ABB implements GenericTree {
 	public void insert(Comparable key){
 		// TODO Auto-generated method stub
 		if(root==null)
-			root = new Node(key, null, null, null);
+			root = new Node(key, null, null);
 		else{
 			for(Node aux=root; aux!=null;){
 				if(key.compareTo(aux.key)<=0){
@@ -72,7 +69,7 @@ public class ABB implements GenericTree {
 						continue;
 					}
 					else{
-						aux.setLeft(new Node(key, null, null, aux));
+						aux.setLeft(new Node(key, null, null));
 						return;
 					}
 				}
@@ -82,7 +79,7 @@ public class ABB implements GenericTree {
 						continue;
 					}
 					else{
-						aux.setRight(new Node(key, null, null, aux));
+						aux.setRight(new Node(key, null, null));
 						return;
 					}
 				}
@@ -93,19 +90,57 @@ public class ABB implements GenericTree {
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public boolean delete(Comparable key) {
+	public void delete(Comparable key) {
 		// TODO Auto-generated method stub
-		return false;
+		root = delete(key, root);
+	}
+	private Node delete(Comparable key, Node node){
+		if(node != null){
+			if(root.key.compareTo(key)==0){
+				Node aux = root.getLeft();
+				if(aux == null){
+					return root.getRight();
+				}
+				while(aux.getRight() != null)
+					aux = aux.getRight();
+				aux.setRight(root.getRight());
+				return aux;
+			}
+			else if(root.key.compareTo(key)<0){
+				
+			}
+		}
+		return null;
 	}
 
 	public long size(){
-		return sizeR(root);
+		return MemoryUtil.deepMemoryUsageOf(this);
 	}
+
 	private long sizeR(Node n){
 		if(n==null){
 			return 0;
 		}
-		return 1+sizeR(n.getLeft())+sizeR(n.getRight());
+		return this.sizeR(n.getLeft())+sizeR(n.getRight());
+	}
+	
+	static public void main(String [] args) throws IOException{
+		ABB a = new ABB();
+		a.insert(new Integer(1));
+		a.insert(new Integer(2));
+		a.insert(new Integer(0));
+		a.insert(new Integer(4));
+		System.out.println(a.size());
+		System.out.println(a.root.key);
+		a.delete(new Integer(1));
+		System.out.println(a.root.key);
+		a.delete(new Integer(0));
+		System.out.println(a.root.key);
+		a.delete(new Integer(4));
+		System.out.println(a.root.key);
+		a.delete(new Integer(2));
+		System.out.println(a.size());
+		a.delete(new Integer(5));
 	}
 	
 }

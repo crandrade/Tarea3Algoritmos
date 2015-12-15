@@ -1,7 +1,5 @@
 package Tarea3Algoritmos;
 
-import Tarea3Algoritmos.ABB.Node;
-
 public class SplayTree implements GenericTree {
 	private Node root;
 	private class Node{
@@ -10,11 +8,10 @@ public class SplayTree implements GenericTree {
 		private Node left, right, father;
 		
 		@SuppressWarnings("rawtypes")
-		public Node(Comparable i, Node left, Node right, Node father){
+		public Node(Comparable i, Node left, Node right){
 			this.key = i;
 			this.setLeft(left);
 			this.setRight(right);
-			this.setFather(father);
 		}
 		public Node getRight() {
 			return right;
@@ -27,12 +24,6 @@ public class SplayTree implements GenericTree {
 		}
 		public void setLeft(Node left) {
 			this.left = left;
-		}
-		public Node getFather() {
-			return father;
-		}
-		public void setFather(Node father) {
-			this.father = father;
 		}
 	}
 	
@@ -59,9 +50,9 @@ public class SplayTree implements GenericTree {
 	}
 
 	@Override
-	public boolean delete(Comparable key) {
+	public void delete(Comparable key) {
 		// TODO Auto-generated method stub
-		return false;
+		return;
 	}
 
 }
