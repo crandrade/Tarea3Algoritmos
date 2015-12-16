@@ -1,18 +1,16 @@
 package Tarea3Algoritmos;
 
-
 public class AVL extends GenericTree {
 	private Node root;
 
 	private class Node extends GenericNode{
-		private AVL left, right, father;
+		private AVL left, right;
 		
-		public Node(int i, int j, AVL father){
+		public Node(int i, int j){
 			this.key = i;
 			this.value = j;
 			this.setLeft(new AVL());
 			this.setRight(new AVL());
-			this.setFather(father);
 		}
 		public AVL getRight() {
 			return right;
@@ -26,31 +24,58 @@ public class AVL extends GenericTree {
 		public void setLeft(AVL left) {
 			this.left = left;
 		}
-		public AVL getFather() {
-			return father;
-		}
-		public void setFather(AVL father) {
-			this.father = father;
-		}
 	}
 	
-	public AVL() {
-		// TODO Auto-generated constructor stub
+	public AVL(){
 		root = null;
 	}
 
 	@Override
 	public GenericNode find(int key) {
-		// TODO Auto-generated method stub
-		return root;
+		return findAVL(key).root;
+	}
+	private AVL findAVL(int key){
+		if(root != null){
+			if(root.key == key){
+				return this;
+			}
+			else if(root.key > key){
+				return root.getLeft().findAVL(key);
+			}
+			else 
+				return root.getRight().findAVL(key);
+		}
+		else return this;
 	}
 
 	@Override
 	public void insert(int key, int value) {
-		// TODO Auto-generated method stub
-
+		if(root==null){
+			root = new Node(key, value);
+			rebalance();
+		}
+		else if(root.key > key){
+			root.getLeft().insert(key,value);
+		}
+		else
+			root.getRight().insert(key,value);
 	}
-
+	private int height(){
+		if(root == null){
+			return 0;
+		}
+		return 1+(int)Math.max(root.getLeft().height(), root.getRight().height());
+	}
+	private void rebalance(){
+		// TODO Auto-generated method stub
+		this.height();
+	}
+	public boolean isLeaf(){
+		return root.getLeft().isEmpty() && root.getRight().isEmpty();
+	}
+	public boolean isEmpty(){
+		return root == null;
+	}
 	@Override
 	public void delete(int key) {
 

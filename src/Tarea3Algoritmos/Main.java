@@ -51,16 +51,10 @@ public class Main {
 	static public int[] generateIntArray(boolean o, int[][] chain, int l) {
 		int[] patron = new int[10000];
 		int max = Integer.MAX_VALUE;
-		if (o) { // o == true
-			int k = (int) Math.pow(2, l);
-			for (int j = 0; j < 10000; j++) {
-				int i = ThreadLocalRandom.current().nextInt(0, k);
-				patron[j] = chain[i];
-			}
-		} else { // o == false
-			for (int j = 0; j < 10000; j++) {
-				patron[j] = - ThreadLocalRandom.current().nextInt(0, max);
-			}
+		int k = (int) Math.pow(2, l);
+		for (int j = 0; j < 10000; j++) {
+			int i = ThreadLocalRandom.current().nextInt(0, k);
+			patron[j] =(o? 1: -1)*chain[i][0];
 		}
 		return patron;
 	}
@@ -229,17 +223,17 @@ public class Main {
 				SPL_OccIn[i - l].addValue(spl.size());
 				VEB_OccIn[i - l].addValue(veb.size());
 				// measure IO
-				bhelper_high = abb.getIOs();
-				exthelper_high = avl.getIOs();
-				lin1helper_high = spl.getIOs();
-				lin2helper_high = veb.getIOs();
+				bhelper_high = abb.getIOs(); // set timer
 				ABB_Time_insert[i - l].addValue(bhelper_high + bhelper_low);
+				abb.resetIOs(); //get time
+				exthelper_high = avl.getIOs();
 				AVL_Time_insert[i - l].addValue(exthelper_high + exthelper_low);
-				SPL_Time_insert[i - l].addValue(lin1helper_high + lin1helper_low);
-				VEB_Time_insert[i - l].addValue(lin2helper_high + lin2helper_low);
-				abb.resetIOs();
 				avl.resetIOs();
+				lin1helper_high = spl.getIOs();
+				SPL_Time_insert[i - l].addValue(lin1helper_high + lin1helper_low);
 				spl.resetIOs();
+				lin2helper_high = veb.getIOs();
+				VEB_Time_insert[i - l].addValue(lin2helper_high + lin2helper_low);
 				veb.resetIOs();
 				System.err.print(",");
 				// end measure IO
