@@ -1,6 +1,5 @@
 package Tarea3Algoritmos;
 import java.io.*;
-import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.cli.BasicParser;
@@ -21,7 +20,6 @@ public class Generador {
 			PrintWriter printer = new PrintWriter(new FileWriter(fDir,true));
 			int i = 12000000;
 			int max = 12000000;
-			String [] bases = {"G","C","A","T"};
 			System.err.println("Max iterations: "+i);
 			String line="";
 			for(int j=0; j<i; j++){
