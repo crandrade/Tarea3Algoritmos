@@ -28,7 +28,6 @@ public class Main {
 		String [] phase = new String[2];
 		int [][] result = new int[i][2];
 		File file = new File(filename);
-		@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(file);
 		int j=0;
 		while (scanner.hasNextLine() && j<i) {
@@ -50,11 +49,18 @@ public class Main {
 
 	static public int[] generateIntArray(boolean o, int[][] chain, int l) {
 		int[] patron = new int[10000];
-		int max = Integer.MAX_VALUE;
+		//int max = Integer.MAX_VALUE;
 		int k = (int) Math.pow(2, l);
-		for (int j = 0; j < 10000; j++) {
-			int i = ThreadLocalRandom.current().nextInt(0, k);
-			patron[j] =(o? 1: -1)*chain[i][0];
+		if(o){
+			for (int j = 0; j < 10000; j++) {
+				int i = ThreadLocalRandom.current().nextInt(0, k);
+				patron[j] = chain[i][0];
+			}
+		}
+		else{
+			for (int j = 0; j < 10000; j++) {
+				patron[j] = ThreadLocalRandom.current().nextInt(0, 12000000);
+			}
 		}
 		return patron;
 	}
@@ -101,10 +107,11 @@ public class Main {
 				.format(new Date()) + " output.txt";
 		System.err.println("Opening file at  " + dir);
 		File fDir = new File(dir);
+		@SuppressWarnings("resource")
 		PrintWriter printer = new PrintWriter(new FileWriter(fDir, true));
 
-		int l = 10; // minimal measure
-		int L = 25; // maximal measure
+		int l = 5; // minimal measure
+		int L = 15; // maximal measure
 		int max_it = 100;
 		if (cmd.hasOption("iterations")) {
 			int nn = Integer.parseInt(cmd.getOptionValue(iter.getOpt()));
@@ -113,19 +120,20 @@ public class Main {
 		}
 		if (cmd.hasOption("i")) {
 			int nn = Integer.parseInt(cmd.getOptionValue(power.getOpt()));
-			if (nn >= 10 && nn <= 25)
+			if (nn >= 10 && nn <= 15)
 				l = nn;
 		}
 		if (cmd.hasOption("I")) {
 			int nn = Integer.parseInt(cmd.getOptionValue(power2.getOpt()));
-			if (nn >= l && nn <= 25)
+			if (nn >= l && nn <= 15)
 				L = nn;
 		}
 		boolean random = false;
 		boolean extracted = true;
 		/*
-		 * Medir Ocupación: Al entrar 2^20, 2^21, 2^22, 2^23, 2^24, 2^25 Al
-		 * salir 2^24, 2^23, 2^22, 2^21, 2^20
+		 * Medir Ocupación: 
+		 * Al entrar [2^l, 2^L] 
+		 * Al salir 2^(L-1) 2^l
 		 */
 
 		SummaryStatistics ABB_OccIn[] = new SummaryStatistics[6];
@@ -138,35 +146,37 @@ public class Main {
 		SummaryStatistics VEB_OccOut[] = new SummaryStatistics[5];
 
 		/*
-		 * Medir IO for i in [20, 25] Luego de insertar 2^i Tras realizar 10000
-		 * búsquedas "exitosas" Tras realizar 10000 búsquedas "infructuosas" for
-		 * i in [25, 21] Luego de borrar entre i e i-1 Luego de borrar todo
+		 * Medir tiempo for i in [l, L] Luego de insertar 2^i 
+		 * Tras realizar 10000 búsquedas "exitosas" 
+		 * Tras realizar 10000 búsquedas "infructuosas" 
+		 * for i in [L, l+1] 
+		 * Luego de borrar entre i e i-1 
+		 * Luego de borrar todo
 		 */
 		SummaryStatistics ABB_Time_insert[] = new SummaryStatistics[6];
 		SummaryStatistics ABB_Time_successfulSearch[] = new SummaryStatistics[6];
 		SummaryStatistics ABB_Time_unfavorableSearch[] = new SummaryStatistics[6];
 		SummaryStatistics ABB_Time_deleting[] = new SummaryStatistics[5];
-		SummaryStatistics ABB_Time_erased = new SummaryStatistics(); // resetear
+		SummaryStatistics ABB_Time_erased = new SummaryStatistics(); // reset
 		SummaryStatistics AVL_Time_insert[] = new SummaryStatistics[6];
 		SummaryStatistics AVL_Time_successfulSearch[] = new SummaryStatistics[6];
 		SummaryStatistics AVL_Time_unfavorableSearch[] = new SummaryStatistics[6];
 		SummaryStatistics AVL_Time_deleting[] = new SummaryStatistics[5];
-		SummaryStatistics AVL_Time_erased = new SummaryStatistics(); // resetear
+		SummaryStatistics AVL_Time_erased = new SummaryStatistics(); // reset
 		SummaryStatistics SPL_Time_insert[] = new SummaryStatistics[6];
 		SummaryStatistics SPL_Time_successfulSearch[] = new SummaryStatistics[6];
 		SummaryStatistics SPL_Time_unfavorableSearch[] = new SummaryStatistics[6];
 		SummaryStatistics SPL_Time_deleting[] = new SummaryStatistics[5];
-		SummaryStatistics SPL_Time_erased = new SummaryStatistics(); // resetear
+		SummaryStatistics SPL_Time_erased = new SummaryStatistics(); // reset
 		SummaryStatistics VEB_Time_insert[] = new SummaryStatistics[6];
 		SummaryStatistics VEB_Time_successfulSearch[] = new SummaryStatistics[6];
 		SummaryStatistics VEB_Time_unfavorableSearch[] = new SummaryStatistics[6];
 		SummaryStatistics VEB_Time_deleting[] = new SummaryStatistics[5];
-		SummaryStatistics VEB_Time_erased = new SummaryStatistics(); // resetear
+		SummaryStatistics VEB_Time_erased = new SummaryStatistics(); // reset
 		/* SOMEHOW */
-
+		long timer_in;
 		// test real DNA
 		printer.println("Iteracion\tNombre\tPromedio\tDesviacion\tError(2sigma/raiz(n)*promedio)");
-		int bhelper_low = 0, bhelper_high = 0, exthelper_low = 0, exthelper_high = 0, lin1helper_low = 0, lin1helper_high = 0, lin2helper_low = 0, lin2helper_high = 0;
 		for (int i = 0; i < 6; i++) {
 			ABB_OccIn[i] = new SummaryStatistics();
 			AVL_OccIn[i] = new SummaryStatistics();
@@ -208,104 +218,127 @@ public class Main {
 			int max = 0;
 			System.err.print("\nFilling >>");
 			for (int i = l; i <= L; i++) {
+				//-----------------------
+				// insertions
+				//-----------------------
 				System.err.print("2^" + i);
 				max = (int) Math.pow(2, i);
+				timer_in = System.currentTimeMillis();
 				for (int j = actual; j < max; j++) {
 					abb.insert(keys_and_values[j][0],keys_and_values[j][1]);
+				}
+				ABB_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int j = actual; j < max; j++) {
 					avl.insert(keys_and_values[j][0],keys_and_values[j][1]);
+				}
+				AVL_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int j = actual; j < max; j++) {
 					spl.insert(keys_and_values[j][0],keys_and_values[j][1]);
+				}
+				SPL_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int j = actual; j < max; j++) {
 					veb.insert(keys_and_values[j][0],keys_and_values[j][1]);
 				}
+				VEB_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
 				System.err.print(".");
 				// measure Occupation
 				ABB_OccIn[i - l].addValue(abb.size());
 				AVL_OccIn[i - l].addValue(avl.size());
 				SPL_OccIn[i - l].addValue(spl.size());
 				VEB_OccIn[i - l].addValue(veb.size());
-				// measure IO
-				bhelper_high = abb.getIOs(); // set timer
-				ABB_Time_insert[i - l].addValue(bhelper_high + bhelper_low);
-				abb.resetIOs(); //get time
-				exthelper_high = avl.getIOs();
-				AVL_Time_insert[i - l].addValue(exthelper_high + exthelper_low);
-				avl.resetIOs();
-				lin1helper_high = spl.getIOs();
-				SPL_Time_insert[i - l].addValue(lin1helper_high + lin1helper_low);
-				spl.resetIOs();
-				lin2helper_high = veb.getIOs();
-				VEB_Time_insert[i - l].addValue(lin2helper_high + lin2helper_low);
-				veb.resetIOs();
 				System.err.print(",");
-				// end measure IO
 				actual = max;
+				//-----------------------
 				// find successful
+				//-----------------------
 				int[] patron = generateIntArray(extracted, keys_and_values, l);
+				timer_in = System.currentTimeMillis();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					abb.find(patron[iterations]);
+				}
+				ABB_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int iterations = 0; iterations < 10000; iterations++) {
 					avl.find(patron[iterations]);
+				}
+				AVL_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int iterations = 0; iterations < 10000; iterations++) {
 					spl.find(patron[iterations]);
+				}
+				SPL_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int iterations = 0; iterations < 10000; iterations++) {
 					veb.find(patron[iterations]);
 				}
+				VEB_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
 				System.err.print(".");
-				// measure IOs
-				ABB_Time_successfulSearch[i - l].addValue(abb.getIOs());
-				AVL_Time_successfulSearch[i - l].addValue(avl.getIOs());
-				SPL_Time_successfulSearch[i - l].addValue(spl.getIOs());
-				VEB_Time_successfulSearch[i - l].addValue(veb.getIOs());
-				abb.resetIOs();
-				avl.resetIOs();
-				spl.resetIOs();
-				veb.resetIOs();
-				System.err.print("m");
-				// end measure IOs
+				//-----------------------
 				// find unfavorable
+				//-----------------------
 				patron = generateIntArray(random, keys_and_values, l);
+				timer_in = System.currentTimeMillis();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					abb.find(patron[iterations]);
+				}
+				ABB_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int iterations = 0; iterations < 10000; iterations++) {
 					avl.find(patron[iterations]);
+				}
+				AVL_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int iterations = 0; iterations < 10000; iterations++) {
 					spl.find(patron[iterations]);
+				}
+				SPL_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int iterations = 0; iterations < 10000; iterations++) {
 					veb.find(patron[iterations]);
 				}
+				VEB_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
 				System.err.print(".");
-				// measure IOs
-				ABB_Time_unfavorableSearch[i - l].addValue(abb.getIOs());
-				AVL_Time_unfavorableSearch[i - l].addValue(avl.getIOs());
-				SPL_Time_unfavorableSearch[i - l].addValue(spl.getIOs());
-				VEB_Time_unfavorableSearch[i - l].addValue(veb.getIOs());
-				abb.resetIOs();
-				avl.resetIOs();
-				spl.resetIOs();
-				veb.resetIOs();
 				System.err.print(",");
 				// migrate helpers => low accumulates all inserting IOs
-				bhelper_low += bhelper_high;
-				exthelper_low += exthelper_high;
-				lin1helper_low += lin1helper_high;
-				lin2helper_low += lin2helper_high;
 			}
 			System.err.print("\nErasing >>");
 			actual = (int) Math.pow(2, L);
 			int min = 0;
-			bhelper_low = bhelper_high = 0;
-			exthelper_low = exthelper_high = 0;
-			lin1helper_low = lin1helper_high = 0;
-			lin2helper_low = lin2helper_high = 0;
-
 			// randomize erasing
 			List<int[]> a = Arrays.asList(keys_and_values);
 			Collections.shuffle(a);
 			keys_and_values = (int[][]) a.toArray();
 
 			System.gc(); // clean old keys_and_values
+			//-----------------------
+			// erasing
+			//-----------------------
 			for (int i = L; i > l; i--) {
 				System.err.print("2^" + i + "->2^" + (i - 1) + " >> ");
 				min = (int) Math.pow(2, i - 1);
+				timer_in = System.currentTimeMillis();
 				for (int j = actual - 1; j >= min; j--) {
 					abb.delete(keys_and_values[i][0]);
+				}
+				ABB_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int j = actual - 1; j >= min; j--) {
 					avl.delete(keys_and_values[i][0]);
+				}
+				AVL_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int j = actual - 1; j >= min; j--) {
 					spl.delete(keys_and_values[i][0]);
+				}
+				SPL_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
+				timer_in = System.currentTimeMillis();
+				for (int j = actual - 1; j >= min; j--) {
 					veb.delete(keys_and_values[i][0]);
 				}
+				VEB_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
 				System.err.print(".");
 				actual = min;
 				// measure Occupation
@@ -313,28 +346,34 @@ public class Main {
 				AVL_OccOut[i - l - 1].addValue(avl.size());
 				SPL_OccOut[i - l - 1].addValue(spl.size());
 				VEB_OccOut[i - l - 1].addValue(veb.size());
-				// measure IOs
-				ABB_Time_deleting[i - l - 1].addValue(abb.getIOs());
-				AVL_Time_deleting[i - l - 1].addValue(avl.getIOs());
-				SPL_Time_deleting[i - l - 1].addValue(spl.getIOs());
-				VEB_Time_deleting[i - l - 1].addValue(veb.getIOs());
 				System.err.print(",");
 			}
+			//-----------------------
+			// final erasing
+			//-----------------------
+			timer_in = System.currentTimeMillis();
 			for (int i = actual - 1; i >= 0; i--) {
-				abb.delete(keys_and_values[i]);
-				avl.delete(keys_and_values[i]);
-				spl.delete(keys_and_values[i]);
-				veb.delete(keys_and_values[i]);
+				abb.delete(keys_and_values[i][0]);
 			}
-			// measure
-			ABB_Time_erased.addValue(abb.getIOs());
-			AVL_Time_erased.addValue(avl.getIOs());
-			SPL_Time_erased.addValue(spl.getIOs());
-			VEB_Time_erased.addValue(veb.getIOs());
-			// end
+			ABB_Time_erased.addValue(System.currentTimeMillis() - timer_in);
+			timer_in = System.currentTimeMillis();
+			for (int i = actual - 1; i >= 0; i--) {
+				avl.delete(keys_and_values[i][0]);
+			}
+			AVL_Time_erased.addValue(System.currentTimeMillis() - timer_in);
+			timer_in = System.currentTimeMillis();
+			for (int i = actual - 1; i >= 0; i--) {
+				spl.delete(keys_and_values[i][0]);
+			}
+			SPL_Time_erased.addValue(System.currentTimeMillis() - timer_in);
+			timer_in = System.currentTimeMillis();
+			for (int i = actual - 1; i >= 0; i--) {
+				veb.delete(keys_and_values[i][0]);
+			}
+			VEB_Time_erased.addValue(System.currentTimeMillis() - timer_in);
 			destroy(keys_and_values);
 			/*
-			 * calculate error if reasonable, quit
+			 * print results in file
 			 */
 			double R = Math.sqrt(r + 1);
 			printer.println("Occupation In");
@@ -389,7 +428,6 @@ public class Main {
 								.getMean())));
 			}
 			printer.println("Occupation Out");
-			// TODO
 			for (int k = 4; k >= 0; k--) {
 				printer.println(r
 						+ "\t"
@@ -440,7 +478,7 @@ public class Main {
 						+ (2 * VEB_OccOut[k].getStandardDeviation() / (R * VEB_OccOut[k]
 								.getMean())));
 			}
-			printer.println("IO in");
+			printer.println("TIME in");
 			for (int k = 0; k < 6; k++) {
 				printer.println(r
 						+ "\t"
@@ -491,8 +529,7 @@ public class Main {
 						+ (2 * VEB_Time_insert[k].getStandardDeviation() / (R * VEB_Time_insert[k]
 								.getMean())));
 			}
-			printer.println("IO out");
-			// TODO
+			printer.println("TIME out");
 			for (int k = 4; k >= 0; k--) {
 				printer.println(r
 						+ "\t"
@@ -583,7 +620,7 @@ public class Main {
 					+ "\t"
 					+ (2 * VEB_Time_erased.getStandardDeviation() / (R * VEB_Time_erased
 							.getMean())));
-			printer.println("IO successful search");
+			printer.println("TIME successful search");
 			for (int k = 0; k < 6; k++) {
 				printer.println(r
 						+ "\t"
@@ -640,7 +677,7 @@ public class Main {
 								.getStandardDeviation() / (R * VEB_Time_successfulSearch[k]
 								.getMean())));
 			}
-			printer.println("IO unfavorable search");
+			printer.println("TIME unfavorable search");
 			for (int k = 0; k < 6; k++) {
 				printer.println(r
 						+ "\t"
