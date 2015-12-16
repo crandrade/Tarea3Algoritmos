@@ -4,15 +4,14 @@ public class VanEmdeBoas extends GenericTree {
 	private Node root;
 	
 	private class Node extends GenericNode{
-		@SuppressWarnings("rawtypes")
-		private Comparable key;
+		private int key, value;
 		private Node left, right;
 		
-		@SuppressWarnings("rawtypes")
-		public Node(Comparable i, Node left, Node right){
-			this.key = i;
-			this.setLeft(left);
-			this.setRight(right);
+		public Node(int key, int value){
+			this.key = key;
+			this.value = value;
+			this.setLeft(null);
+			this.setRight(null);
 		}
 		public Node getRight() {
 			return right;
@@ -41,7 +40,8 @@ public class VanEmdeBoas extends GenericTree {
 	@Override
 	public void insert(int key, int value) {
 		// TODO Auto-generated method stub
-
+		Node aux = new Node(key,value);
+		root = aux;
 	}
 
 	@Override

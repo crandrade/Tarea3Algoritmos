@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="lib/commons-cli-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/classmexer.jar"/>
+	<classpathentry kind="lib" path="lib/classmexer.jar" sourcepath="lib/classmexer.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
