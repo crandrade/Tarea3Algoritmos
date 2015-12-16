@@ -1,6 +1,6 @@
 package Tarea3Algoritmos;
 
-public class SplayTree implements GenericTree {
+public class SplayTree extends GenericTree {
 	private Node root;
 	private class Node{
 		@SuppressWarnings("rawtypes")
@@ -29,30 +29,29 @@ public class SplayTree implements GenericTree {
 	
 	public SplayTree() {
 		// TODO Auto-generated constructor stub
+		root = null;
 	}
 
 	@Override
-	public long size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Comparable get(Comparable key) {
+	public GenericNode find(int key) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void insert(Comparable key) {
+	public void insert(int key, int value) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete(Comparable key) {
+	public void delete(int key) {
 		// TODO Auto-generated method stub
 		return;
+	}
+	
+	public void splay(Node n){
+		
 	}
 
 }

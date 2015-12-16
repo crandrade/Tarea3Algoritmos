@@ -1,8 +1,9 @@
 package Tarea3Algoritmos;
 
-public class VanEmdeBoas implements GenericTree {
+public class VanEmdeBoas extends GenericTree {
 	private Node root;
-	private class Node{
+	
+	private class Node extends GenericNode{
 		@SuppressWarnings("rawtypes")
 		private Comparable key;
 		private Node left, right;
@@ -32,25 +33,19 @@ public class VanEmdeBoas implements GenericTree {
 	}
 
 	@Override
-	public long size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Comparable get(Comparable key) {
+	public GenericNode find(int key) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void insert(Comparable key) {
+	public void insert(int key, int value) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete(Comparable key) {
+	public void delete(int key) {
 		// TODO Auto-generated method stub
 		return;
 	}

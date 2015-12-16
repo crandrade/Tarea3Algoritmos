@@ -1,33 +1,15 @@
 package Tarea3Algoritmos;
 
-public class DummyVanEmdeBoas implements GenericTree {
+public class DummyVanEmdeBoas extends GenericTree {
 
-	public DummyVanEmdeBoas() {
-		// TODO Auto-generated constructor stub
-	}
+	public DummyVanEmdeBoas(){}
 
 	@Override
-	public long size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Comparable get(Comparable key) {
-		// TODO Auto-generated method stub
+	public GenericNode find(int key) {
 		return null;
 	}
-
 	@Override
-	public void insert(Comparable key) {
-		// TODO Auto-generated method stub
-
-	}
-
+	public void insert(int key, int value){}
 	@Override
-	public void delete(Comparable key) {
-		// TODO Auto-generated method stub
-		return;
-	}
-
+	public void delete(int key){}
 }

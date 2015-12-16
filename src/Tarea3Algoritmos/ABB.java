@@ -1,33 +1,29 @@
 package Tarea3Algoritmos;
 
 import java.io.*;
-import org.junit.*;
-import com.javamex.classmexer.*;
 
-public class ABB implements GenericTree {
+public class ABB extends GenericTree {
 	private Node root;
 	
-	private class Node{
-		@SuppressWarnings("rawtypes")
-		private Comparable key;
-		private Node left, right;
+	private class Node extends GenericNode{
+		private ABB left, right;
 		
-		@SuppressWarnings("rawtypes")
-		public Node(Comparable i, Node left, Node right){
-			this.key = i;
-			this.setLeft(left);
-			this.setRight(right);
+		public Node(int key, int value){
+			this.key = key;
+			this.value = value;
+			this.setLeft(new ABB());
+			this.setRight(new ABB());
 		}
-		public Node getRight() {
+		public ABB getRight() {
 			return right;
 		}
-		public void setRight(Node rigth) {
+		public void setRight(ABB rigth) {
 			this.right = rigth;
 		}
-		public Node getLeft() {
+		public ABB getLeft() {
 			return left;
 		}
-		public void setLeft(Node left) {
+		public void setLeft(ABB left) {
 			this.left = left;
 		}
 	}
@@ -37,110 +33,103 @@ public class ABB implements GenericTree {
 		root = null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public Comparable get(Comparable key) {
-		// TODO Auto-generated method stub
-		Node aux = root;
-		while(aux != null){
-			int i = aux.key.compareTo(key);
-			if(i == 0){
-				return aux.key;
-			}
-			else if(i < 0)
-				aux = aux.getLeft();
-			else
-				aux = aux.getRight();
-		}
-		return aux != null? aux.key : null;
+	public GenericNode find(int key) {
+		return findABB(key).root;
 	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void insert(Comparable key){
+	private ABB findABB(int key){
 		// TODO Auto-generated method stub
-		if(root==null)
-			root = new Node(key, null, null);
-		else{
-			for(Node aux=root; aux!=null;){
-				if(key.compareTo(aux.key)<=0){
-					if(aux.getLeft()!=null){
-						aux = aux.getLeft();
-						continue;
-					}
-					else{
-						aux.setLeft(new Node(key, null, null));
-						return;
-					}
-				}
-				else{
-					if(aux.getRight()!=null){
-						aux = aux.getLeft();
-						continue;
-					}
-					else{
-						aux.setRight(new Node(key, null, null));
-						return;
-					}
-				}
+		if(root != null){
+			if(root.key == key){
+				return this;
 			}
+			else if(root.key > key){
+				return root.getLeft().findABB(key);
+			}
+			else 
+				return root.getRight().findABB(key);
 		}
-		return;
+		else return this;
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void delete(Comparable key) {
-		// TODO Auto-generated method stub
-		root = delete(key, root);
+	public void insert(int key, int value){
+		if(root==null){
+			root = new Node(key, value);
+		}
+		else if(root.key > key){
+			root.getLeft().insert(key,value);
+		}
+		else
+			root.getRight().insert(key,value);
 	}
-	private Node delete(Comparable key, Node node){
-		if(node != null){
-			if(root.key.compareTo(key)==0){
-				Node aux = root.getLeft();
-				if(aux == null){
-					return root.getRight();
+	public boolean isLeaf(){
+		return root.getLeft().isEmpty() && root.getRight().isEmpty();
+	}
+	public boolean isEmpty(){
+		return root == null;
+	}
+	private Node extractMin(){
+		ABB aux = this;
+		while(!aux.isLeaf() 
+				|| !aux.root.getLeft().isEmpty()){
+			aux = aux.root.getLeft();
+		}
+		int key = aux.root.key;
+		int value = aux.root.value;
+		aux.root = aux.root.getRight().root;
+		return new Node(key,value);
+	}
+	@Override	
+	public void delete(int key){
+		ABB toDelete = findABB(key);
+		if(!toDelete.isEmpty()){
+			if (toDelete.isLeaf()){
+				toDelete.root = null;
+			}
+			else{
+				if(!toDelete.root.getLeft().isEmpty() && !toDelete.root.getRight().isEmpty()){
+					Node aux = toDelete.root.getRight().extractMin();
+					aux.setLeft(toDelete.root.getLeft());
+					aux.setRight(toDelete.root.getRight());
+					toDelete.root = aux; 
 				}
-				while(aux.getRight() != null)
-					aux = aux.getRight();
-				aux.setRight(root.getRight());
-				return aux;
-			}
-			else if(root.key.compareTo(key)<0){
-				
+				else if(toDelete.root.getLeft().isEmpty()){
+					toDelete.root = toDelete.root.getRight().root;
+				}
+				else{
+					toDelete.root = toDelete.root.getLeft().root;
+				}
 			}
 		}
-		return null;
 	}
-
-	public long size(){
-		return MemoryUtil.deepMemoryUsageOf(this);
-	}
-
-	private long sizeR(Node n){
-		if(n==null){
-			return 0;
-		}
-		return this.sizeR(n.getLeft())+sizeR(n.getRight());
-	}
+	
 	
 	static public void main(String [] args) throws IOException{
 		ABB a = new ABB();
-		a.insert(new Integer(1));
-		a.insert(new Integer(2));
-		a.insert(new Integer(0));
-		a.insert(new Integer(4));
 		System.out.println(a.size());
-		System.out.println(a.root.key);
-		a.delete(new Integer(1));
-		System.out.println(a.root.key);
-		a.delete(new Integer(0));
-		System.out.println(a.root.key);
-		a.delete(new Integer(4));
-		System.out.println(a.root.key);
-		a.delete(new Integer(2));
+		a.insert(1, 1);
+		a.insert(2, 2);
+		a.insert(4, 0);
+		a.insert(4, 4);
+		a.insert(5, 4);
 		System.out.println(a.size());
-		a.delete(new Integer(5));
+		a.delete(1);
+		System.out.println(a.size());
+		a.delete(0);
+		System.err.println((a.find(5)).getValue());
+		System.out.println(a.size());
+		a.delete(2);
+		System.err.println((a.find(5)).getValue());
+		System.out.println(a.size());
+		a.delete(4);
+		System.out.println(a.size());
+		System.err.println((a.find(4)).getValue());
+		a.delete(4);
+		System.out.println(a.size());
+		System.err.println((a.find(5)).getValue());
+		a.delete(5);
+		System.out.println(a.size());
 	}
 	
 }

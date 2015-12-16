@@ -1,66 +1,59 @@
 package Tarea3Algoritmos;
 
 
-public class AVL implements GenericTree {
+public class AVL extends GenericTree {
 	private Node root;
 
-	private class Node{
-		@SuppressWarnings("rawtypes")
-		private Comparable key;
-		private Node left, right, father;
+	private class Node extends GenericNode{
+		private AVL left, right, father;
 		
-		@SuppressWarnings("rawtypes")
-		public Node(Comparable i, Node left, Node right, Node father){
+		public Node(int i, int j, AVL father){
 			this.key = i;
-			this.setLeft(left);
-			this.setRight(right);
+			this.value = j;
+			this.setLeft(new AVL());
+			this.setRight(new AVL());
 			this.setFather(father);
 		}
-		public Node getRight() {
+		public AVL getRight() {
 			return right;
 		}
-		public void setRight(Node rigth) {
+		public void setRight(AVL rigth) {
 			this.right = rigth;
 		}
-		public Node getLeft() {
+		public AVL getLeft() {
 			return left;
 		}
-		public void setLeft(Node left) {
+		public void setLeft(AVL left) {
 			this.left = left;
 		}
-		public Node getFather() {
+		public AVL getFather() {
 			return father;
 		}
-		public void setFather(Node father) {
+		public void setFather(AVL father) {
 			this.father = father;
 		}
 	}
 	
 	public AVL() {
 		// TODO Auto-generated constructor stub
+		root = null;
 	}
 
 	@Override
-	public long size() {
+	public GenericNode find(int key) {
 		// TODO Auto-generated method stub
-		return 0;
+		return root;
 	}
 
 	@Override
-	public Comparable get(Comparable key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void insert(Comparable key) {
+	public void insert(int key, int value) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete(Comparable key) {
-		// TODO Auto-generated method stub
+	public void delete(int key) {
+
 		return;
 	}
 

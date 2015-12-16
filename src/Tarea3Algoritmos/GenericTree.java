@@ -1,16 +1,18 @@
 package Tarea3Algoritmos;
 
+import com.javamex.classmexer.MemoryUtil;
 
-public interface GenericTree {
 
-	public long size();
+public abstract class GenericTree {
+
 	
-	@SuppressWarnings("rawtypes")
-	public Comparable get(Comparable key);
+	public abstract GenericNode find(int key);
 	
-	@SuppressWarnings("rawtypes")
-	public void insert(Comparable key);
+	public abstract void insert(int key, int value);
 	
-	@SuppressWarnings("rawtypes")
-	public void delete(Comparable key);
+	public abstract void delete(int key);
+	
+	public long size(){
+		return MemoryUtil.deepMemoryUsageOf(this);
+	}
 }
