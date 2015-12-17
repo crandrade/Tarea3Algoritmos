@@ -107,7 +107,6 @@ public class Main {
 				.format(new Date()) + " output.txt";
 		System.err.println("Opening file at  " + dir);
 		File fDir = new File(dir);
-		@SuppressWarnings("resource")
 		PrintWriter printer = new PrintWriter(new FileWriter(fDir, true));
 
 		int l = 5; // minimal measure
@@ -223,26 +222,26 @@ public class Main {
 				//-----------------------
 				System.err.print("2^" + i);
 				max = (int) Math.pow(2, i);
-				timer_in = System.currentTimeMillis();
+				timer_in = System.nanoTime();
 				for (int j = actual; j < max; j++) {
 					abb.insert(keys_and_values[j][0],keys_and_values[j][1]);
 				}
-				ABB_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				ABB_Time_insert[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int j = actual; j < max; j++) {
 					avl.insert(keys_and_values[j][0],keys_and_values[j][1]);
 				}
-				AVL_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				AVL_Time_insert[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int j = actual; j < max; j++) {
 					spl.insert(keys_and_values[j][0],keys_and_values[j][1]);
 				}
-				SPL_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				SPL_Time_insert[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int j = actual; j < max; j++) {
 					veb.insert(keys_and_values[j][0],keys_and_values[j][1]);
 				}
-				VEB_Time_insert[i - l].addValue(System.currentTimeMillis() - timer_in);
+				VEB_Time_insert[i - l].addValue(System.nanoTime() - timer_in);
 				System.err.print(".");
 				// measure Occupation
 				ABB_OccIn[i - l].addValue(abb.size());
@@ -255,51 +254,51 @@ public class Main {
 				// find successful
 				//-----------------------
 				int[] patron = generateIntArray(extracted, keys_and_values, l);
-				timer_in = System.currentTimeMillis();
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					abb.find(patron[iterations]);
 				}
-				ABB_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				ABB_Time_successfulSearch[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					avl.find(patron[iterations]);
 				}
-				AVL_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				AVL_Time_successfulSearch[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					spl.find(patron[iterations]);
 				}
-				SPL_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				SPL_Time_successfulSearch[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					veb.find(patron[iterations]);
 				}
-				VEB_Time_successfulSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				VEB_Time_successfulSearch[i - l].addValue(System.nanoTime() - timer_in);
 				System.err.print(".");
 				//-----------------------
 				// find unfavorable
 				//-----------------------
 				patron = generateIntArray(random, keys_and_values, l);
-				timer_in = System.currentTimeMillis();
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					abb.find(patron[iterations]);
 				}
-				ABB_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				ABB_Time_unfavorableSearch[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					avl.find(patron[iterations]);
 				}
-				AVL_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				AVL_Time_unfavorableSearch[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					spl.find(patron[iterations]);
 				}
-				SPL_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				SPL_Time_unfavorableSearch[i - l].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int iterations = 0; iterations < 10000; iterations++) {
 					veb.find(patron[iterations]);
 				}
-				VEB_Time_unfavorableSearch[i - l].addValue(System.currentTimeMillis() - timer_in);
+				VEB_Time_unfavorableSearch[i - l].addValue(System.nanoTime() - timer_in);
 				System.err.print(".");
 				System.err.print(",");
 				// migrate helpers => low accumulates all inserting IOs
@@ -319,26 +318,26 @@ public class Main {
 			for (int i = L; i > l; i--) {
 				System.err.print("2^" + i + "->2^" + (i - 1) + " >> ");
 				min = (int) Math.pow(2, i - 1);
-				timer_in = System.currentTimeMillis();
+				timer_in = System.nanoTime();
 				for (int j = actual - 1; j >= min; j--) {
 					abb.delete(keys_and_values[i][0]);
 				}
-				ABB_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
-				for (int j = actual - 1; j >= min; j--) {
-					avl.delete(keys_and_values[i][0]);
-				}
-				AVL_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				ABB_Time_deleting[i - l - 1].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
+//				for (int j = actual - 1; j >= min; j--) {
+//					avl.delete(keys_and_values[i][0]);
+//				}
+				AVL_Time_deleting[i - l - 1].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int j = actual - 1; j >= min; j--) {
 					spl.delete(keys_and_values[i][0]);
 				}
-				SPL_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
-				timer_in = System.currentTimeMillis();
+				SPL_Time_deleting[i - l - 1].addValue(System.nanoTime() - timer_in);
+				timer_in = System.nanoTime();
 				for (int j = actual - 1; j >= min; j--) {
 					veb.delete(keys_and_values[i][0]);
 				}
-				VEB_Time_deleting[i - l - 1].addValue(System.currentTimeMillis() - timer_in);
+				VEB_Time_deleting[i - l - 1].addValue(System.nanoTime() - timer_in);
 				System.err.print(".");
 				actual = min;
 				// measure Occupation
@@ -351,26 +350,26 @@ public class Main {
 			//-----------------------
 			// final erasing
 			//-----------------------
-			timer_in = System.currentTimeMillis();
+			timer_in = System.nanoTime();
 			for (int i = actual - 1; i >= 0; i--) {
 				abb.delete(keys_and_values[i][0]);
 			}
-			ABB_Time_erased.addValue(System.currentTimeMillis() - timer_in);
-			timer_in = System.currentTimeMillis();
-			for (int i = actual - 1; i >= 0; i--) {
-				avl.delete(keys_and_values[i][0]);
-			}
-			AVL_Time_erased.addValue(System.currentTimeMillis() - timer_in);
-			timer_in = System.currentTimeMillis();
+			ABB_Time_erased.addValue(System.nanoTime() - timer_in);
+			timer_in = System.nanoTime();
+//			for (int i = actual - 1; i >= 0; i--) {
+//				avl.delete(keys_and_values[i][0]);
+//			}
+			AVL_Time_erased.addValue(System.nanoTime() - timer_in);
+			timer_in = System.nanoTime();
 			for (int i = actual - 1; i >= 0; i--) {
 				spl.delete(keys_and_values[i][0]);
 			}
-			SPL_Time_erased.addValue(System.currentTimeMillis() - timer_in);
-			timer_in = System.currentTimeMillis();
+			SPL_Time_erased.addValue(System.nanoTime() - timer_in);
+			timer_in = System.nanoTime();
 			for (int i = actual - 1; i >= 0; i--) {
 				veb.delete(keys_and_values[i][0]);
 			}
-			VEB_Time_erased.addValue(System.currentTimeMillis() - timer_in);
+			VEB_Time_erased.addValue(System.nanoTime() - timer_in);
 			destroy(keys_and_values);
 			/*
 			 * print results in file
@@ -736,6 +735,7 @@ public class Main {
 								.getMean())));
 			}
 		}
+		printer.close();
 		/* print to file */
 	}
 }

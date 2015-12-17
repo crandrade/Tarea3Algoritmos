@@ -64,67 +64,112 @@ public class AVL extends GenericTree {
 			root.getLeft().insert(key,value);
 			if(Math.abs(root.getLeft().height()-root.getRight().height())==2){
 				if(key < root.getLeft().root.key){
-					rebalance(LEFT,SINGLE);
+					root = rebalance(root, LEFT,SINGLE);
 				}
-				else rebalance(LEFT,DOUBLE);
+				else root = rebalance(root, LEFT,DOUBLE);
 			}
 		}
 		else if (root.key < key){
 			root.getRight().insert(key, value);
 			if(Math.abs(root.getLeft().height() - root.getRight().height())==2){
 				if(key > root.getRight().root.key){
-					rebalance(RIGHT,SINGLE);
+					root = rebalance(root, RIGHT,SINGLE);
 				}
-				else rebalance(RIGHT,DOUBLE);
+				else root = rebalance(root, RIGHT,DOUBLE);
 			}
 		}
 	}
 	private int height(){
-		return root == null? 0: 1 + root.getLeft().height() + root.getRight().height();
+		return root == null? 0: 1 + Math.max(root.getLeft().height(),root.getRight().height());
 	}
-	private void rebalance(int side, int times){
-		AVL auxleft, auxright;
+	private Node rebalance(Node r, int side, int times){
+		Node auxleft, auxright;
 		if(side == LEFT){
 			if(times==SINGLE){
-				auxleft = root.getLeft();
-				root.setLeft(auxleft.root.getRight());
-				auxright = new AVL(this.root);
-				auxleft.root.setRight(auxright);
-				root = auxleft.root;
-				return;
+				auxleft = r.getLeft().root;
+				r.setLeft(auxleft.getRight());
+				auxleft.setRight(new AVL(r));
+				return auxleft;
 			}
 			else{
-				root.getLeft().rebalance(RIGHT, SINGLE);
-				this.rebalance(LEFT, SINGLE);
+				r.setLeft(new AVL(rebalance(r.getLeft().root,RIGHT, SINGLE)));
+				return rebalance(r,LEFT, SINGLE);
 			}
 		}
 		else{
 			if(times == SINGLE){
-				auxright = root.getRight();
-				root.setRight(auxright.root.getLeft());
-				auxleft = new AVL(this.root);
-				auxright.root.setLeft(auxleft);
-				root = auxright.root;
-				return;
+				auxright = r.getRight().root;
+				r.setRight(auxright.getLeft());
+				auxright.setLeft(new AVL(r));
+				return auxright;
 			}
 			else{
-				root.getRight().rebalance(LEFT, SINGLE);
-				this.rebalance(RIGHT, SINGLE);	
+				r.setRight(new AVL(rebalance(r.getRight().root,LEFT, SINGLE)));
+				return rebalance(r,RIGHT, SINGLE);	
 			}
 		}
 		
 	}
-	
 	public boolean isLeaf(){
 		return root.getLeft().isEmpty() && root.getRight().isEmpty();
 	}
 	public boolean isEmpty(){
 		return root == null;
 	}
+	private Node extractMin(){
+		AVL aux = new AVL(root);
+		while(!aux.isLeaf() 
+				&& !aux.root.getLeft().isEmpty()){
+			aux = aux.root.getLeft();
+		}
+		int key = aux.root.key;
+		int value = aux.root.value;
+		aux.root = aux.root.getRight().root;
+		return new Node(key,value);
+	}
 	@Override
 	public void delete(int key) {
-
-		return;
+		if(root == null) return;
+		if(root.key > key){
+			root.getLeft().delete(key);
+			if(Math.abs(root.getLeft().height()-root.getRight().height())==2){
+				if(root.getLeft().root != null && key < root.getLeft().root.key){
+					root = rebalance(root, RIGHT,SINGLE);
+				}
+				else root = rebalance(root, LEFT,SINGLE);
+			}
+		}
+		else if (root.key < key){
+			root.getRight().delete(key);
+			if(Math.abs(root.getLeft().height() - root.getRight().height())==2){
+				if(root.getRight().root != null && key > root.getRight().root.key){
+					root = rebalance(root, LEFT,SINGLE);
+				}
+				else root = rebalance(root, RIGHT,SINGLE);
+			}
+		}
+		else{ // found it
+			if(isLeaf()){
+				root = null;
+			}
+			else{
+				if(!root.getLeft().isEmpty() && !root.getRight().isEmpty()){
+					Node aux = root.getRight().extractMin();
+					aux.setLeft(root.getLeft());
+					aux.setRight(root.getRight());
+					if(root.getRight().height()-root.getLeft().height() >=2){
+						root = rebalance(aux, RIGHT, SINGLE);
+					}
+					root = aux; 
+				}
+				else if(root.getLeft().isEmpty()){
+					root = root.getRight().root;
+				}
+				else{
+					root = root.getLeft().root;
+				}
+			}
+		}
 	}
 	
 	static public void main(String [] args) throws IOException{
@@ -142,18 +187,17 @@ public class AVL extends GenericTree {
 		a.insert(10, 4);
 		a.insert(11, 4);
 		a.insert(12, 4);
+		a.insert(13, 4);
+		a.insert(14, 4);
+		a.insert(15, 4);
+		a.insert(16, 4);
+		a.insert(0, 4);
 		System.out.println(a.size());
-		a.delete(1);
+		a.delete(9);
 		System.out.println(a.size());
-		a.delete(0);
-		System.err.println((a.find(5)).getValue());
-		System.out.println(a.size());
-		a.delete(2);
-		System.err.println((a.find(5)).getValue());
-		System.out.println(a.size());
-		a.delete(4);
-		System.out.println(a.size());
-		System.err.println((a.find(5)).getValue());
+		a.delete(11);
+		a.delete(5);
+		a.delete(7);
 		a.delete(5);
 		System.out.println(a.size());
 	}

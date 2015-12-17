@@ -72,7 +72,7 @@ public class ABB extends GenericTree {
 	private Node extractMin(){
 		ABB aux = this;
 		while(!aux.isLeaf() 
-				|| !aux.root.getLeft().isEmpty()){
+				&& !aux.root.getLeft().isEmpty()){
 			aux = aux.root.getLeft();
 		}
 		int key = aux.root.key;
@@ -110,9 +110,21 @@ public class ABB extends GenericTree {
 		System.out.println(a.size());
 		a.insert(1, 1);
 		a.insert(2, 2);
-		a.insert(4, 0);
+		a.insert(3, 0);
 		a.insert(4, 4);
-		a.insert(5, 4);
+		a.insert(5, 5);
+		a.insert(6, 4);
+		a.insert(7, 4);
+		a.insert(8, 4);
+		a.insert(9, 4);
+		a.insert(10, 4);
+		a.insert(11, 4);
+		a.insert(12, 4);
+		a.insert(13, 4);
+		a.insert(14, 4);
+		a.insert(15, 4);
+		a.insert(16, 4);
+		a.insert(0, 4);
 		System.out.println(a.size());
 		a.delete(1);
 		System.out.println(a.size());
